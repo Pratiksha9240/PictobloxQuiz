@@ -1,0 +1,385 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PictoBlox Medium Quiz | Alphagen Learning</title><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"><script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script><style>
+        :root {
+            --purple: #5e48c4;
+            --dark: #4a3aad;
+            --yellow: #ffd071;
+            --pale: #eae7fe;
+            --ghost: #f5f4ff;
+            --control: #ffab19;
+            --operator: #59c059;
+            --looks: #9966ff;
+            --motion: #4c97ff;
+            --sensing: #5cb1d6
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: #100a20;
+            color: #211b30;
+            font-family: Poppins, sans-serif;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh
+        }
+
+        .header {
+            width: min(1280px, 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: var(--purple);
+            color: white;
+            padding: 13px 19px;
+            border-radius: 14px;
+            font-weight: 800
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px
+        }
+
+        .logo {
+            background: var(--yellow);
+            color: #191525;
+            padding: 9px 15px;
+            border-radius: 9px;
+            font-size: 13px
+        }
+
+        .score {
+            background: var(--dark);
+            border-radius: 9px;
+            padding: 9px 15px;
+            font-size: 14px
+        }
+
+        .score span {
+            color: var(--yellow)
+        }
+
+        .wrap {
+            width: 1280px;
+            margin-top: 12px;
+            transform-origin: top center
+        }
+
+        .stage {
+            width: 1280px;
+            height: 720px;
+            background: white;
+            border-radius: 25px;
+            position: relative;
+            overflow: hidden
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 34px 60px
+        }
+
+        .slide.active {
+            display: flex
+        }
+
+        .badge {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--purple);
+            background: var(--ghost);
+            border: 2px solid var(--pale);
+            border-radius: 25px;
+            padding: 9px 20px;
+            margin-bottom: 17px
+        }
+
+        h1 {
+            font-size: 48px;
+            line-height: 1.22;
+            margin: 9px 0 15px
+        }
+
+        h2 {
+            font-size: 27px;
+            line-height: 1.4;
+            margin: 0
+        }
+
+        .subtitle {
+            font-size: 17px;
+            color: #615c68;
+            margin: 10px 0 24px
+        }
+
+        .question {
+            background: var(--ghost);
+            border: 2px solid var(--pale);
+            border-radius: 20px;
+            padding: 17px 28px;
+            width: 940px;
+            max-width: 100%;
+            margin-bottom: 18px
+        }
+
+        .options {
+            width: 960px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px
+        }
+
+        .option {
+            border: 2px solid var(--pale);
+            background: white;
+            border-radius: 17px;
+            min-height: 99px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 13px;
+            cursor: pointer;
+            font: 700 18px Poppins, sans-serif
+        }
+
+        .option:hover:not(:disabled) {
+            border-color: var(--purple);
+            background: var(--ghost)
+        }
+
+        .option:disabled {
+            cursor: default
+        }
+
+        .option.correct {
+            background: #f0fdf4;
+            border: 3px solid #22c55e
+        }
+
+        .option.wrong {
+            background: #fff0f1;
+            border: 3px solid #ef6671
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 13px;
+            padding: 14px 30px;
+            background: var(--yellow);
+            font: 800 17px Poppins;
+            cursor: pointer
+        }
+
+        .next {
+            background: var(--purple);
+            color: white;
+            visibility: hidden;
+            margin-top: 10px
+        }
+
+        .next.visible {
+            visibility: visible
+        }
+
+        .feedback {
+            min-height: 43px;
+            visibility: hidden;
+            margin-top: 13px;
+            border-radius: 10px;
+            padding: 9px 16px;
+            font-weight: 700;
+            font-size: 14px
+        }
+
+        .feedback.show {
+            visibility: visible;
+            background: #dcfce7;
+            color: #166534
+        }
+
+        .feedback.try {
+            background: #fff0f1;
+            color: #993040
+        }
+
+        .block {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 9px 14px;
+            color: white;
+            border-radius: 7px;
+            font: 500 17px Arial, sans-serif;
+            box-shadow: inset 0 -3px #0002;
+            white-space: nowrap
+        }
+
+        .control {
+            background: var(--control)
+        }
+
+        .operator {
+            background: var(--operator)
+        }
+
+        .looks {
+            background: var(--looks)
+        }
+
+        .motion {
+            background: var(--motion)
+        }
+
+        .sensing {
+            background: var(--sensing)
+        }
+
+        .hex {
+            clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 50%, calc(100% - 13px) 100%, 13px 100%, 0 50%);
+            padding: 10px 23px
+        }
+
+        .pill {
+            border-radius: 28px
+        }
+
+        .input {
+            background: white;
+            color: #333;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 16px
+        }
+
+        .code {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 16px;
+            padding: 16px 24px;
+            margin: 0 0 17px;
+            display: flex;
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 3px;
+            max-width: 900px
+        }
+
+        .indent {
+            margin-left: 25px
+        }
+
+        .scene {
+            font-size: 58px;
+            margin: 12px 0 19px
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 12px;
+            color: white;
+            font-weight: 700;
+            font-size: 13px
+        }
+
+        .nav button {
+            background: #2a1c68;
+            color: var(--yellow);
+            border: 2px solid var(--purple);
+            border-radius: 11px;
+            padding: 10px 21px;
+            font: 700 14px Poppins;
+            cursor: pointer
+        }
+
+        .nav button:disabled {
+            opacity: .35;
+            cursor: default
+        }
+
+        .final {
+            background: #fff3cc;
+            border: 2px solid var(--yellow);
+            border-radius: 22px;
+            padding: 20px 70px;
+            margin: 16px 0
+        }
+
+        .final strong {
+            display: block;
+            color: var(--purple);
+            font-size: 49px
+        }
+
+        .answer {
+            color: var(--purple);
+            font-size: 20px;
+            font-weight: 800
+        }
+
+        .small {
+            font-size: 14px;
+            color: #716a7a
+        }
+
+        .ocean {
+            width: 350px;
+            height: 115px;
+            border-radius: 18px;
+            background: linear-gradient(180deg, #d9f6ff, #7ccdec);
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            font-size: 60px;
+            margin: 10px 0 25px
+        }
+
+        .block.variable {
+            background: #ff8c1a
+        }
+
+        .block.operator {
+            background: #59c059
+        }
+
+        .block.looks {
+            background: #9966ff
+        }
+
+        .block .block {
+            font-size: 17px;
+            min-height: 30px;
+            padding: 4px 9px;
+            box-shadow: none
+        }
+
+        .code {
+            max-width: 900px
+        }
+
+        .option {
+            overflow-wrap: anywhere
+        }
+    </style></head><body><header class="header"><div class="brand"><span class="logo">ALPHAGEN LEARNING</span><span>PictoBlox – Challenge Quiz</span></div><div class="score">★ Score: <span id="score">0</span> / 150</div></header><div class="wrap" id="wrap"><main class="stage"><section class="slide active" id="slide-1"><div class="badge">PICTOBLOX · INTERACTIVE QUIZ</div><h1>PictoBlox<br><span style="color:var(--purple)">Challenge Time!</span></h1><p class="subtitle">15 questions · Medium level</p><button class="btn" onclick="go(2)">Start Quiz →</button></section><section class="slide" id="slide-2"><div class="badge">QUESTION 1 OF 15 · 10 POINTS</div><div class="question"><h2>A sprite starts at x = -40. It changes x by 15 three times. Where is it now?</h2></div><div class="code"><span class="block motion">repeat 3 → change x by 15</span></div><div class="options" id="options-1"><button class="option" onclick="answer(1,0,this)">-25</button><button class="option" onclick="answer(1,1,this)">5</button><button class="option" onclick="answer(1,2,this)">45</button><button class="option" onclick="answer(1,3,this)">-5</button></div><div class="feedback" id="feedback-1"></div><button class="btn next" id="next-1" onclick="go(3)">Next Question →</button></section><section class="slide" id="slide-3"><div class="badge">QUESTION 2 OF 15 · 10 POINTS</div><div class="question"><h2>Score is 8. Which condition is TRUE?</h2></div><div class="code"><span class="block operator">Score = 8</span></div><div class="options" id="options-2"><button class="option" onclick="answer(2,0,this)">Score &lt; 8</button><button class="option" onclick="answer(2,1,this)">Score = 10</button><button class="option" onclick="answer(2,2,this)">Score &gt; 5</button><button class="option" onclick="answer(2,3,this)">Score &gt; 12</button></div><div class="feedback" id="feedback-2"></div><button class="btn next" id="next-2" onclick="go(4)">Next Question →</button></section><section class="slide" id="slide-4"><div class="badge">QUESTION 3 OF 15 · 10 POINTS</div><div class="question"><h2>What happens if the sprite is NOT touching the wall?</h2></div><div class="code"><span class="block control">if touching wall → bounce; else → move 10 steps</span></div><div class="options" id="options-3"><button class="option" onclick="answer(3,0,this)">It bounces</button><button class="option" onclick="answer(3,1,this)">It keeps moving</button><button class="option" onclick="answer(3,2,this)">It stops all scripts</button><button class="option" onclick="answer(3,3,this)">It changes backdrop</button></div><div class="feedback" id="feedback-3"></div><button class="btn next" id="next-3" onclick="go(5)">Next Question →</button></section><section class="slide" id="slide-5"><div class="badge">QUESTION 4 OF 15 · 10 POINTS</div><div class="question"><h2>A game picks a random number from 2 to 6. Which result is impossible?</h2></div><div class="code"><span class="block operator">pick random 2 to 6</span></div><div class="options" id="options-4"><button class="option" onclick="answer(4,0,this)">2</button><button class="option" onclick="answer(4,1,this)">4</button><button class="option" onclick="answer(4,2,this)">6</button><button class="option" onclick="answer(4,3,this)">7</button></div><div class="feedback" id="feedback-4"></div><button class="btn next" id="next-4" onclick="go(6)">Next Question →</button></section><section class="slide" id="slide-6"><div class="badge">QUESTION 5 OF 15 · 10 POINTS</div><div class="question"><h2>A sprite broadcasts “start”. Which script reacts?</h2></div><div class="code"><span class="block looks">broadcast start</span></div><div class="options" id="options-5"><button class="option" onclick="answer(5,0,this)">when green flag clicked</button><button class="option" onclick="answer(5,1,this)">when I receive start</button><button class="option" onclick="answer(5,2,this)">when space key pressed</button><button class="option" onclick="answer(5,3,this)">when this sprite clicked</button></div><div class="feedback" id="feedback-5"></div><button class="btn next" id="next-5" onclick="go(7)">Next Question →</button></section><section class="slide" id="slide-7"><div class="badge">QUESTION 6 OF 15 · 10 POINTS</div><div class="question"><h2>A character repeats: move 10 steps, turn 90°. Four times. What path can it make?</h2></div><div class="code"><span class="block control">repeat 4 → move 10 steps → turn 90°</span></div><div class="options" id="options-6"><button class="option" onclick="answer(6,0,this)">A square</button><button class="option" onclick="answer(6,1,this)">A straight line</button><button class="option" onclick="answer(6,2,this)">A triangle</button><button class="option" onclick="answer(6,3,this)">A circle</button></div><div class="feedback" id="feedback-6"></div><button class="btn next" id="next-6" onclick="go(8)">Next Question →</button></section><section class="slide" id="slide-8"><div class="badge">QUESTION 7 OF 15 · 10 POINTS</div><div class="question"><h2>Lives = 3. The player loses one life twice. How many remain?</h2></div><div class="code"><span class="block variable">set Lives to 3; change Lives by -1 twice</span></div><div class="options" id="options-7"><button class="option" onclick="answer(7,0,this)">0</button><button class="option" onclick="answer(7,1,this)">1</button><button class="option" onclick="answer(7,2,this)">2</button><button class="option" onclick="answer(7,3,this)">5</button></div><div class="feedback" id="feedback-7"></div><button class="btn next" id="next-7" onclick="go(9)">Next Question →</button></section><section class="slide" id="slide-9"><div class="badge">QUESTION 8 OF 15 · 10 POINTS</div><div class="question"><h2>Which block waits until the character touches the target?</h2></div><div class="code"><span class="block control">Pause until contact</span></div><div class="options" id="options-8"><button class="option" onclick="answer(8,0,this)">wait 1 seconds</button><button class="option" onclick="answer(8,1,this)">repeat 10</button><button class="option" onclick="answer(8,2,this)">wait until touching target</button><button class="option" onclick="answer(8,3,this)">forever move 10 steps</button></div><div class="feedback" id="feedback-8"></div><button class="btn next" id="next-8" onclick="go(10)">Next Question →</button></section><section class="slide" id="slide-10"><div class="badge">QUESTION 9 OF 15 · 10 POINTS</div><div class="question"><h2>A sprite says “Win!” only when score ≥ 10. Score is 10. What happens?</h2></div><div class="code"><span class="block control">if Score ≥ 10 → say Win!</span></div><div class="options" id="options-9"><button class="option" onclick="answer(9,0,this)">It says “Win!”</button><button class="option" onclick="answer(9,1,this)">It says nothing</button><button class="option" onclick="answer(9,2,this)">Score resets</button><button class="option" onclick="answer(9,3,this)">Sprite disappears</button></div><div class="feedback" id="feedback-9"></div><button class="btn next" id="next-9" onclick="go(11)">Next Question →</button></section><section class="slide" id="slide-11"><div class="badge">QUESTION 10 OF 15 · 10 POINTS</div><div class="question"><h2>In PictoBlox, speech recognition returns “turn on lamp”. Which check matches?</h2></div><div class="code"><span class="block sensing">speech recognition result = turn on lamp</span></div><div class="options" id="options-10"><button class="option" onclick="answer(10,0,this)">result contains “fan”</button><button class="option" onclick="answer(10,1,this)">result contains “lamp”</button><button class="option" onclick="answer(10,2,this)">result contains “radio”</button><button class="option" onclick="answer(10,3,this)">result contains “off”</button></div><div class="feedback" id="feedback-10"></div><button class="btn next" id="next-10" onclick="go(12)">Next Question →</button></section><section class="slide" id="slide-12"><div class="badge">QUESTION 11 OF 15 · 10 POINTS</div><div class="question"><h2>Which change fixes a sprite that moves left when the RIGHT arrow is pressed?</h2></div><div class="code"><span class="block motion">when right arrow pressed</span></div><div class="options" id="options-11"><button class="option" onclick="answer(11,0,this)">change x by -10</button><button class="option" onclick="answer(11,1,this)">change y by 10</button><button class="option" onclick="answer(11,2,this)">change x by 10</button><button class="option" onclick="answer(11,3,this)">change y by -10</button></div><div class="feedback" id="feedback-11"></div><button class="btn next" id="next-11" onclick="go(13)">Next Question →</button></section><section class="slide" id="slide-13"><div class="badge">QUESTION 12 OF 15 · 10 POINTS</div><div class="question"><h2>A quiz sends “correct” after a right answer. What should the score sprite do?</h2></div><div class="code"><span class="block looks">broadcast correct</span></div><div class="options" id="options-12"><button class="option" onclick="answer(12,0,this)">Decrease score</button><button class="option" onclick="answer(12,1,this)">Show a success message</button><button class="option" onclick="answer(12,2,this)">Restart the quiz</button><button class="option" onclick="answer(12,3,this)">Hide every sprite</button></div><div class="feedback" id="feedback-12"></div><button class="btn next" id="next-12" onclick="go(14)">Next Question →</button></section><section class="slide" id="slide-14"><div class="badge">QUESTION 13 OF 15 · 10 POINTS</div><div class="question"><h2>A variable starts at 2. Repeat 3 times: change it by 2. Final value?</h2></div><div class="code"><span class="block variable">set Points to 2; repeat 3 → change Points by 2</span></div><div class="options" id="options-13"><button class="option" onclick="answer(13,0,this)">6</button><button class="option" onclick="answer(13,1,this)">7</button><button class="option" onclick="answer(13,2,this)">8</button><button class="option" onclick="answer(13,3,this)">10</button></div><div class="feedback" id="feedback-13"></div><button class="btn next" id="next-13" onclick="go(15)">Next Question →</button></section><section class="slide" id="slide-15"><div class="badge">QUESTION 14 OF 15 · 10 POINTS</div><div class="question"><h2>A sprite must avoid a red obstacle. Which logic is best?</h2></div><div class="code"><span class="block control">Obstacle avoidance</span></div><div class="options" id="options-14"><button class="option" onclick="answer(14,0,this)">if touching red → turn away</button><button class="option" onclick="answer(14,1,this)">if touching red → move forward</button><button class="option" onclick="answer(14,2,this)">if score &gt; 5 → turn away</button><button class="option" onclick="answer(14,3,this)">if key space pressed → say Hello</button></div><div class="feedback" id="feedback-14"></div><button class="btn next" id="next-14" onclick="go(16)">Next Question →</button></section><section class="slide" id="slide-16"><div class="badge">QUESTION 15 OF 15 · 10 POINTS</div><div class="question"><h2>A robot hears “move forward” but stays still. Speech is recognized correctly. What should you check FIRST?</h2></div><div class="code"><span class="block sensing">speech result = move forward</span></div><div class="options" id="options-15"><button class="option" onclick="answer(15,0,this)">Whether the action is linked to the matching phrase</button><button class="option" onclick="answer(15,1,this)">Whether the backdrop is blue</button><button class="option" onclick="answer(15,2,this)">Whether the sprite is bigger</button><button class="option" onclick="answer(15,3,this)">Whether the score is zero</button></div><div class="feedback" id="feedback-15"></div><button class="btn next" id="next-15" onclick="go(17)">See My Score →</button></section><section class="slide" id="slide-17"><div class="badge">QUIZ COMPLETE!</div><h1>Great Work!<br><span style="color:var(--purple)">PictoBlox Explorer!</span></h1><div class="final">YOUR SCORE<strong id="final-score">0 / 150</strong></div><p class="subtitle" id="message"></p><button class="btn" onclick="resetQuiz()">↻ Try Again</button></section></main><nav class="nav"><button id="prev" onclick="move(-1)">← Previous</button><span id="counter">Slide 1 / 17</span><button id="forward" onclick="move(1)">Next →</button></nav></div><script>let current=1,score=0,answered={};const keys=[1, 2, 1, 3, 1, 0, 1, 2, 0, 1, 2, 1, 2, 0, 0],explanations=["-40 + 15 + 15 + 15 = 5.", "8 is greater than 5.", "The ELSE action runs when the touching condition is false.", "7 is outside the range 2 to 6.", "The matching receive event responds to the broadcast.", "Four equal sides and four right-angle turns can form a square.", "3 \u2212 1 \u2212 1 = 1 life.", "Wait until checks the condition before continuing.", "The \u2265 comparison includes 10 itself.", "The recognized words include \u201clamp\u201d.", "Positive x movement goes right.", "The receiving sprite can show success feedback.", "2 + 2 + 2 + 2 = 8.", "The color-touching condition detects the obstacle.", "Recognition alone does not move the robot; the matching condition must trigger the action."];
+function celebrate(n){if(typeof confetti==='function')confetti({particleCount:n,spread:70,origin:{y:.65}})}
+function update(){document.querySelectorAll('.slide').forEach((s,i)=>s.classList.toggle('active',i+1===current));document.getElementById('prev').disabled=current===1;document.getElementById('forward').disabled=current===17||(current>=2&&current<=16&&!answered[current-1]);document.getElementById('counter').textContent=`Slide ${current} / 17`;if(current===17){document.getElementById('final-score').textContent=score+' / 150';document.getElementById('message').textContent=score>=120?'Excellent problem solving!':score>=80?'Good work! Keep exploring!':'Nice effort! Try again to improve!';celebrate(110)}}
+function go(n){if(n<1||n>17)return;if(n>current&&current>=2&&current<=16&&!answered[current-1])return;current=n;update()}
+function move(d){go(current+d)}
+function answer(q,choice,btn){if(answered[q])return;answered[q]=true;const correct=choice===keys[q-1];const opts=[...document.querySelectorAll('#options-'+q+' .option')];opts.forEach(o=>o.disabled=true);btn.classList.add(correct?'correct':'wrong');if(!correct)opts[keys[q-1]].classList.add('correct');if(correct){score+=10;document.getElementById('score').textContent=score;celebrate(35)}const fb=document.getElementById('feedback-'+q);fb.className='feedback show'+(correct?'':' try');fb.textContent=(correct?'Great! +10 points. ':'Good try! ')+explanations[q-1];document.getElementById('next-'+q).classList.add('visible');update()}
+function resetQuiz(){score=0;answered={};document.getElementById('score').textContent='0';for(let q=1;q<=15;q++){document.querySelectorAll('#options-'+q+' .option').forEach(o=>{o.disabled=false;o.classList.remove('correct','wrong')});const fb=document.getElementById('feedback-'+q);fb.className='feedback';fb.textContent='';document.getElementById('next-'+q).classList.remove('visible')}current=1;update()}
+function scale(){const s=Math.min(1,(innerWidth-24)/1280);const w=document.getElementById('wrap');w.style.transform=`scale(${s})`;w.style.marginBottom=(732*s-732)+'px'}window.addEventListener('resize',scale);document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;if(e.key==='ArrowRight')move(1);if(e.key==='ArrowLeft')move(-1)});scale();update();</script></body></html>
